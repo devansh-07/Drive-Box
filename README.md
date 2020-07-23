@@ -5,25 +5,25 @@ This is a GUI application which allows the user to:
 - Upload files to Google Drive
 - Download files from Google Drive
 
-### Details
+## Details
 
 It uses [Google OAuth 2.0](https://developers.google.com/identity/protocols/oauth2) and [Google Drive API](https://developers.google.com/drive) to get details of the files stored in Drive and Upload or Download files.
 You only need to authenticate once and the application saves the access token for next run. Once Authorized, you can Upload/Download files easily.
 
-### Requirements
+## Requirements
 
 - Python 3 (or above)
 - [tkinter](https://docs.python.org/3/library/tk.html)
 - Google client libraries
 - [PIL](https://pypi.org/project/Pillow/)
 
-### How to use?
+## How to use?
 
 - Install Python3 (if not already installed).
 - Clone the Drive-Box git repository.
 - Go to [Google API console](https://console.developers.google.com/apis).
 - Create a new Project and enable Google Drive API for it.
-- Now go to Credentials, select OAuth client ID, download client secrets from here, save it as 'credentials.json' and copy it in 'Drive-Box/files/important/' directory.
+- Now go to Credentials, select OAuth client ID, download client secrets from here, save it as 'credentials.json' and copy it in 'Drive-Box/files/secrets/' directory.
 
 - Now, Install the required libraries by executing following command:
 

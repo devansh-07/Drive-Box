@@ -18,8 +18,8 @@ class DriveAPI:
         self.creds = None
         self.auth = 1
 
-        if os.path.exists('files/important/token.pickle'):
-            with open('files/important/token.pickle', 'rb') as token:
+        if os.path.exists('files/secrets/token.pickle'):
+            with open('files/secrets/token.pickle', 'rb') as token:
                 self.creds = pickle.load(token)
 
         # If there are no (valid) credentials available, let the user log in.
@@ -30,11 +30,11 @@ class DriveAPI:
         if self.creds and self.creds.expired and self.creds.refresh_token:
             self.creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file('files/important/credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file('files/secrets/credentials.json', SCOPES)
             self.creds = flow.run_local_server(port=0)
 
         # Save the credentials for the next run
-        with open('files/important/token.pickle', 'wb') as token:
+        with open('files/secrets/token.pickle', 'wb') as token:
             pickle.dump(self.creds, token)
 
     def _callAPI(self):

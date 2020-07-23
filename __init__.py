@@ -18,7 +18,7 @@ access = True
 sm_font = ('Verdana', 9)
 darkbg = "#292929"
 wht = "#ffffff"
-imgLogo = Image.open("files/important/logo.png").resize((80, 70))
+imgLogo = Image.open("files/images/logo.png").resize((80, 70))
 
 def disableAll(f):
     for wd in f.winfo_children():
@@ -110,7 +110,7 @@ def _showTop(event=None):
         isTopActive = True
 
 def _removeToken():
-    os.remove('files/important/token.pickle')
+    os.remove('files/images/token.pickle')
     td = threading.Thread(target=_signOut)
     td.daemon = True
     td.start()
@@ -226,7 +226,7 @@ def _mainPage():
 
     rfrBtn = Button(topF, fg=wht, bg="#1f1f1f", width=20, height=20, activebackground="#141414", activeforeground=wht, border=0, cursor='hand2', font=sm_font, command=refreshHelper)
     rfrBtn.pack(side=RIGHT, padx=(150, 0), pady=(10, 10))
-    rfrImg = PhotoImage(file='files/important/refresh.png')
+    rfrImg = PhotoImage(file='files/images/refresh.png')
     rfrBtn.config(image=rfrImg)
     rfrBtn.image = rfrImg
     CreateToolTip(rfrBtn, "Refresh")
@@ -326,7 +326,7 @@ root.title("DrivePlay")
 root.configure(bg=darkbg)
 root.geometry("450x220+400+400")
 try:
-    p = ImageTk.PhotoImage(file='files/important/icon.png')
+    p = ImageTk.PhotoImage(file='files/images/icon.png')
     root.iconphoto(False, p)
 except:
     pass
