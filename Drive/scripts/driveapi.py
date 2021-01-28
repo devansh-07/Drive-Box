@@ -20,8 +20,8 @@ class DriveAPI:
         self.creds = None
         self.auth = 1
 
-        if os.path.exists(os.environ['TOKEN_PATH']):
-            with open(os.environ['TOKEN_PATH'], 'rb') as token:
+        if os.path.exists(os.environ.get('TOKEN_PATH', os.getcwd())):
+            with open(os.environ.get('TOKEN_PATH', os.getcwd()), 'rb') as token:
                 self.creds = pickle.load(token)
 
         # If there are no (valid) credentials available, let the user log in.
@@ -36,7 +36,7 @@ class DriveAPI:
             self.creds = flow.run_local_server(port=0)
 
         # Save the credentials for the next run
-        with open(os.environ['TOKEN_PATH'], 'wb') as token:
+        with open(os.environ.get('TOKEN_PATH', os.getcwd()), 'wb') as token:
             pickle.dump(self.creds, token)
 
     def _callAPI(self):
