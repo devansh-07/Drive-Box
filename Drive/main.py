@@ -1,16 +1,19 @@
 import os
 import time
+from pathlib import Path
+import oauthlib
+import requests
 import threading
-import tkinter.ttk as ttk
 from tkinter import *
+import tkinter.ttk as ttk
 from tkinter import filedialog
 from io import BytesIO
 from PIL import ImageTk, Image
-from files.scripts.driveapi import DriveAPI
-from files.scripts.toolTip import CreateToolTip
-from files.scripts.mask import masking
-import oauthlib
-import requests
+from .scripts.driveapi import DriveAPI
+from .scripts.toolTip import CreateToolTip
+from .scripts.mask import masking
+
+BASE_DIR = Path(__file__).resolve().parent
 
 global conn, access, darkbg, USER, mainFrame, logoFrame, lbl_logo, wht, sm_font, imgLogo
 conn = True
@@ -18,7 +21,7 @@ access = True
 sm_font = ('Verdana', 9)
 darkbg = "#292929"
 wht = "#ffffff"
-imgLogo = Image.open("files/images/logo.png").resize((80, 70))
+imgLogo = Image.open(os.path.join(BASE_DIR, "images/logo.png")).resize((80, 70))
 
 def disableAll(f):
     for wd in f.winfo_children():
@@ -110,7 +113,7 @@ def _showTop(event=None):
         isTopActive = True
 
 def _removeToken():
-    os.remove('files/images/token.pickle')
+    os.remove(os.environ["TOKEN_PATH"])
     td = threading.Thread(target=_signOut)
     td.daemon = True
     td.start()
@@ -182,8 +185,21 @@ def upload():
     tup.daemon = True
     tup.start()
 
+
+def _connToAPI():
+    global conn, name, prfPic, USER
+    k = USER._callAPI()
+
+    if k == False:
+        conn = False
+    else:
+        name, url = USER._getProfile()
+        img_data = requests.get(url).content
+        prfPic = masking(Image.open(BytesIO(img_data)).resize((56, 56)))
+
+
 def _mainPage():
-    global filePath, mainF1, files, logoFrame, lbl_logo, prfPic, name, statusLbl, isTopActive, prf, soFrm, downBtn, tltp
+    global filePath, mainF1, files, logoFrame, lbl_logo, prfPic, name, statusLbl, isTopActive, prf, soFrm, downBtn, tltp, root
     root.geometry("450x470")
 
     small_logo = ImageTk.PhotoImage(imgLogo.resize((64, 56)))
@@ -226,7 +242,7 @@ def _mainPage():
 
     rfrBtn = Button(topF, fg=wht, bg="#1f1f1f", width=20, height=20, activebackground="#141414", activeforeground=wht, border=0, cursor='hand2', font=sm_font, command=refreshHelper)
     rfrBtn.pack(side=RIGHT, padx=(150, 0), pady=(10, 10))
-    rfrImg = PhotoImage(file='files/images/refresh.png')
+    rfrImg = PhotoImage(file=os.path.join(BASE_DIR, 'images/refresh.png'))
     rfrBtn.config(image=rfrImg)
     rfrBtn.image = rfrImg
     CreateToolTip(rfrBtn, "Refresh")
@@ -256,22 +272,12 @@ def destroyWidgets(f):
         wd.destroy()
 
 def getAuth_API():
-    global access
+    global access, USER
     try:
         USER._getAuth()
         _connToAPI()
     except oauthlib.oauth2.rfc6749.errors.AccessDeniedError:
         access = False
-
-def _connToAPI():
-    global conn, name, prfPic
-    k = USER._callAPI()
-    if k == False:
-        conn = False
-    else:
-        name, url = USER._getProfile()
-        img_data = requests.get(url).content
-        prfPic = masking(Image.open(BytesIO(img_data)).resize((56, 56)))
 
 def thrAuth():
     t1 = threading.Thread(target=getAuth_API)
@@ -309,6 +315,7 @@ def waitForAuth(thr):
             lbl.config(fg='#EA4436', text="Access Denied.")
 
 def waitForConn(thr):
+    global mainFrame
     s = 'Connecting to Drive'
     lbl1 = Label(mainFrame, text=s, bg=darkbg, font=('Arial', 12))
     lbl1.pack(pady=(30, 0))
@@ -320,39 +327,44 @@ def waitForConn(thr):
     else:
         lbl1.config(fg='#EA4436', text="Can't connect to Drive\nNo Internet", font=('Arial', 13))
 
-root = Tk()
-root.resizable(width=False, height=False)
-root.title("DrivePlay")
-root.configure(bg=darkbg)
-root.geometry("450x220+400+400")
-try:
-    p = ImageTk.PhotoImage(file='files/images/icon.png')
-    root.iconphoto(False, p)
-except:
-    pass
+def main():
+    global mainFrame, logoFrame, USER, root, logo, lbl_logo
 
-logoFrame = Frame(root, bg=darkbg)
-logoFrame.pack(side=TOP, padx=(10, 10), pady=(20, 0))
+    root = Tk()
+    root.resizable(width=False, height=False)
+    root.title("Drive Box")
+    root.configure(bg=darkbg)
+    root.geometry("450x220+400+400")
 
-mainFrame = Frame(root, bg=darkbg)
-mainFrame.pack(padx=10, pady=(10, 0))
+    try:
+        p = ImageTk.PhotoImage(file=os.path.join(BASE_DIR, 'images/icon.png'))
+        root.iconphoto(False, p)
+    except:
+        pass
 
-logo = ImageTk.PhotoImage(imgLogo)
-lbl_logo = Label(logoFrame, image=logo, bg=darkbg)
-lbl_logo.pack(side=LEFT, anchor='nw', pady=(20, 0))
+    logoFrame = Frame(root, bg=darkbg)
+    logoFrame.pack(side=TOP, padx=(10, 10), pady=(20, 0))
 
-USER = DriveAPI()
-if USER.auth == 0:
-    lbl_logo.pack(pady=(10, 0))
+    mainFrame = Frame(root, bg=darkbg)
+    mainFrame.pack(padx=10, pady=(10, 0))
 
-    button = Button(mainFrame, text="Start", fg=wht, bg="#1f1f1f", activebackground="#141414", activeforeground=wht, border=0, cursor='hand2', width=7, command=thrAuth)
-    button.pack(side=TOP, pady=(30, 10))
-else:
-    th1 = threading.Thread(target=_connToAPI)
-    th1.daemon = True
-    th1.start()
-    th12 = threading.Thread(target=lambda: waitForConn(th1))
-    th12.daemon = True
-    th12.start()
+    logo = ImageTk.PhotoImage(imgLogo)
+    lbl_logo = Label(logoFrame, image=logo, bg=darkbg)
+    lbl_logo.pack(side=LEFT, anchor='nw', pady=(20, 0))
 
-root.mainloop()
+    USER = DriveAPI()
+
+    if USER.auth == 0:
+        lbl_logo.pack(pady=(10, 0))
+        button = Button(mainFrame, text="Start", fg=wht, bg="#1f1f1f", activebackground="#141414", activeforeground=wht, border=0, cursor='hand2', width=7, command=thrAuth)
+        button.pack(side=TOP, pady=(30, 10))
+    else:
+        th1 = threading.Thread(target=_connToAPI)
+        th1.daemon = True
+        th1.start()
+
+        th12 = threading.Thread(target=lambda: waitForConn(th1))
+        th12.daemon = True
+        th12.start()
+
+    root.mainloop()

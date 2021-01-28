@@ -4,6 +4,7 @@ import os.path
 import io
 import shutil
 import requests
+from pathlib import Path
 from mimetypes import MimeTypes
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -11,15 +12,16 @@ from google.auth.transport.requests import Request
 from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 
 class DriveAPI:
-    global SCOPES
+    global SCOPES, BASE_DIR
+    BASE_DIR = Path(__file__).resolve().parent.parent
     SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/userinfo.profile']
 
     def __init__(self):
         self.creds = None
         self.auth = 1
 
-        if os.path.exists('files/secrets/token.pickle'):
-            with open('files/secrets/token.pickle', 'rb') as token:
+        if os.path.exists(os.environ['TOKEN_PATH']):
+            with open(os.environ['TOKEN_PATH'], 'rb') as token:
                 self.creds = pickle.load(token)
 
         # If there are no (valid) credentials available, let the user log in.
@@ -30,11 +32,11 @@ class DriveAPI:
         if self.creds and self.creds.expired and self.creds.refresh_token:
             self.creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file('files/secrets/credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(os.path.join(BASE_DIR, 'secrets/credentials.json'), SCOPES)
             self.creds = flow.run_local_server(port=0)
 
         # Save the credentials for the next run
-        with open('files/secrets/token.pickle', 'wb') as token:
+        with open(os.environ['TOKEN_PATH'], 'wb') as token:
             pickle.dump(self.creds, token)
 
     def _callAPI(self):
