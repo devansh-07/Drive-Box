@@ -22,6 +22,7 @@ setup(
         'google-api-core==1.21.0',
         'google-auth-httplib2==0.0.4',
         'google-auth-oauthlib==0.4.1',
+        'numpy==1.19.0',
         'Pillow==7.0.0'
     ],
     long_description=read('README.md'),
