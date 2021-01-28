@@ -22,7 +22,7 @@ setup(
         'google-api-core==1.21.0',
         'google-auth-httplib2==0.0.4',
         'google-auth-oauthlib==0.4.1',
-        'Pillow==7.0.0'
+        'Pillow==7.1.0'
     ],
     long_description=read('README.md'),
     entry_points={'console_scripts': ['mydrive=Drive.main:main']},
