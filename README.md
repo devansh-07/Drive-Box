@@ -20,10 +20,13 @@ You only need to authenticate once and the application saves the access token fo
 ## How to use?
 
 - Install Python3 (if not already installed).
-- Clone the Drive-Box git repository.
+- Clone the repository.
+
+    `git clone https://github.com/devansh-07/Drive-Box.git`
+    
 - Go to [Google API console](https://console.developers.google.com/apis).
 - Create a new Project and enable Google Drive API for it.
-- Now go to Credentials, select OAuth client ID, download client secrets from here, save it as 'credentials.json' and copy it in 'Drive-Box/files/secrets/' directory.
+- Now go to Credentials, select OAuth client ID, download client secrets from here, save it as 'credentials.json' and copy it in 'Drive-Box/Drive/secrets/' directory.
 
 - Now, Install the required libraries by executing following command:
 
@@ -32,6 +35,13 @@ You only need to authenticate once and the application saves the access token fo
 - Now, execute the following command from Drive-Box directory to run the script:
 
     `python3 __init__.py`
+    
+    or you can install it and run it using the command *mydrive*
+    
+    ```
+    python3 setup.py install
+    mydrive
+    ```
 
 - A new browser window will be opened. Allow the application to access the Google Drive data and close the window after the authorization flow has completed.
 - Now you can Upload and Download files.
