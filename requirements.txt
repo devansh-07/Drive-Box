@@ -4,4 +4,4 @@ google-auth==1.19.1
 google-auth-httplib2==0.0.4
 google-auth-oauthlib==0.4.1
 numpy==1.19.0
-Pillow==7.1.0
+Pillow==8.2.0
